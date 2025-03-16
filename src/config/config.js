@@ -1,0 +1,1 @@
+export const baseUrl = 'https://pdfuploadbackend-q2gt.onrender.com'

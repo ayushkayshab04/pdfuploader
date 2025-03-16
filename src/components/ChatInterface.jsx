@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { baseUrl } from "../config/config";
 
 const ChatInterface = ({pdfUrl}) => {
   const [input, setInput] = useState("");
@@ -8,8 +9,8 @@ const ChatInterface = ({pdfUrl}) => {
   const sendMessage = async () => {
     if (!input.trim()) return;
     setMessages((prev) => [...prev, { sender: "user", text: input }]);
-    const response = await axios.post("http://localhost:5000/api/chat/ask", { message: input,pdfText:pdfUrl });
-    console.log("=========anbswer",response.data.response.answer)
+    const response = await axios.post(`${baseUrl}/api/chat/ask`, { message: input,pdfText:pdfUrl });
+    // console.log("=========anbswer",response.data.response.answer)
     setMessages((prev) => [...prev, { sender: "bot", text: response.data.response.answer }]);
     setInput("");
   };

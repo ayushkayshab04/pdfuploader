@@ -2,6 +2,7 @@ import React, { useRef, useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import axios from "axios";
 import { UploadIcon } from "../Icons/GenricIcon";
+import { baseUrl } from "../config/config";
 
 // Use the local worker from node_modules
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
@@ -28,7 +29,7 @@ const PdfUploadViewer = ({ pdfUrl, setPdfUrl }) => {
     formData.append("pdf", selectedFile);
 
     try {
-      const res = await axios.post("http://localhost:5000/api/pdf/upload", formData, {
+      const res = await axios.post(`${baseUrl}/api/pdf/upload`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       console.log("Extracted text:", res.data.text);
