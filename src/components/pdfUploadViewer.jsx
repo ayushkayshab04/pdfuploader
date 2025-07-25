@@ -10,13 +10,13 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/b
 const PdfUploadViewer = ({ pdfUrl, setPdfUrl }) => {
   const [numPages, setNumPages] = useState(0);
   const [pdfUrlString, setPdfUrlString] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
   const inputRef = useRef(null);
 
   const handleFileSelect = (event) => {
     const selectedFile = event.target.files?.[0];
     if (selectedFile) {
       const url = URL.createObjectURL(selectedFile);
-      console.log("=====++Url", url);
       setPdfUrlString(url);
       handleUpload(selectedFile);
     }
@@ -27,6 +27,7 @@ const PdfUploadViewer = ({ pdfUrl, setPdfUrl }) => {
 
     const formData = new FormData();
     formData.append("pdf", selectedFile);
+    setIsUploading(true); // Start loader
 
     try {
       const res = await axios.post(`${baseUrl}/api/pdf/upload`, formData, {
@@ -36,12 +37,19 @@ const PdfUploadViewer = ({ pdfUrl, setPdfUrl }) => {
       setPdfUrl(res.data.text);
     } catch (error) {
       console.error("Upload failed:", error);
+    } finally {
+      setIsUploading(false); // Stop loader
     }
   };
 
   return (
     <div style={{ textAlign: "center", padding: "20px" }}>
-      {pdfUrl ? (
+      {isUploading ? (
+        <div style={{ marginTop: "50px" }}>
+          <div className="spinner" />
+          <p style={{ marginTop: "20px", color: "#888" }}>Uploading PDF...</p>
+        </div>
+      ) : pdfUrl ? (
         <div
           style={{
             display: "flex",
@@ -54,8 +62,8 @@ const PdfUploadViewer = ({ pdfUrl, setPdfUrl }) => {
               border: "1px solid gray",
               borderRadius: "10px",
               width: "100%",
-              height: "90vh", // Limit height to 80% of the viewport
-              overflowY: "auto", // Enable internal scrolling
+              height: "90vh",
+              overflowY: "auto",
               padding: "10px",
               boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
               backgroundColor: "#f9f9f9",
@@ -108,6 +116,26 @@ const PdfUploadViewer = ({ pdfUrl, setPdfUrl }) => {
           />
         </>
       )}
+
+      {/* Simple Spinner CSS */}
+      <style>
+        {`
+          .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #F6DC43;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+          }
+
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}
+      </style>
     </div>
   );
 };
